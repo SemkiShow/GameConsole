@@ -3,6 +3,8 @@
 #include <charMap.h>
 #include <icons_7x7.h>
 #include <icons_8x8.h>
+#define MU_PRINT 1
+#include <MicroUART.h>
 
 // Joystick init
 #define JXPin A2
@@ -18,9 +20,10 @@ int JXHold = false;
 int JYHold = false;
 int JSHold = false;
 int JHoldDelay = 500;
-long JMillis = 0;
+unsigned long JMillis = 0;
 
 // Public variables
+MicroUART uart;
 int cursorPosition = 0;
 int gamesAmount = 6;
 String menu = "Main";
@@ -234,6 +237,7 @@ void Debug()
 
 void MainMenu(bool update = false)
 {
+  menu = "Main";
   // if (JYLast == JY && JSLast == JS && !update) {return;}
   if (JS > 0)
   {
@@ -260,11 +264,11 @@ void MainMenu(bool update = false)
   {
     cursorPosition = 0;
   }
-  oled.home();
   oled.clear();
+  oled.home();
   // String games[] = {"Tetris", "Snake", "Race", "Tic Tac Toe", "Flappy Bird", "Battleships", "Chess", "Super Mario Bros.", "Platformer", "Pseudo-3D Shooter", "Quizzes", "Text", "Random numbers generator", "Reaction test", "Clicker", "Chrome Dino"};
-  String games[] = {"Tetris", "Snake", "Flappy Bird", "Race", "Settings", "Debug"};
-  // Serial.print(sizeof(games)/sizeof(games[0]));
+  String games[6] = {"Tetris", "Snake", "Flappy Bird", "Race", "Settings", "Debug"};
+  // uart.print(sizeof(games)/sizeof(games[0]));
   oled.invertText(true);
   oled.println(games[cursorPosition]);
   oled.invertText(false);
@@ -381,7 +385,7 @@ void JoystickCheck()
 
 void setup()
 {
-  Serial.begin(9600);
+  // uart.begin(9600);
 
   // Pin init
   pinMode(JXPin, INPUT_PULLUP);
@@ -398,8 +402,8 @@ void setup()
   oled.setScale(1);
   oled.autoPrintln(true);
 
-  // Classes init
-  // settings = new Settings();
+  // General init
+  menu = "Main";
 
   // Logo
   FullBridgeRectifier();
@@ -410,42 +414,44 @@ void setup()
     // oled.update(127 - i, 0, 127 - i + delta, 63);
     oled.rect(i, 63, i + delta, 63);
     oled.update();
-    // Serial.print(i);
+    // uart.print(i);
     // delay(1000/delta);
   }
   oled.clear();
   oled.update();
+  MainMenu();
 }
 
 void loop() 
 {
   JoystickCheck();
   if (menu == "Main") {MainMenu();}
-  if (menu == "") {}
+  // if (menu == "") {}
   if (menu == "FlappyBird") {flappyBird.update();}
-  if (menu == "") {}
+  // if (menu == "") {}
   if (menu == "Settings") {settings.update();}
   if (menu == "Debug") {Debug();}
-  // Serial.print(JX);
-  // Serial.print(" ");
-  // Serial.print(JY);
-  // Serial.print(" ");
-  // Serial.print(JS);
-  // Serial.print("    ");
-  // Serial.print(JXHold);
-  // Serial.print(" ");
-  // Serial.print(JYHold);
-  // Serial.print(" ");
-  // Serial.print(JSHold);
-  // Serial.print("    ");
-  // Serial.print(analogRead(JXPin));
-  // Serial.print(" ");
-  // Serial.print(analogRead(JYPin));
-  // Serial.print(" ");
-  // Serial.print(analogRead(JSPin));
-  // Serial.print("    ");
-  // Serial.print(millis() - JMillis);
-  // Serial.print("    ");
-  // Serial.println();
+  // uart.print(JX);
+  // uart.print(" ");
+  // uart.print(JY);
+  // uart.print(" ");
+  // uart.print(JS);
+  // uart.print("    ");
+  // uart.print(JXHold);
+  // uart.print(" ");
+  // uart.print(JYHold);
+  // uart.print(" ");
+  // uart.print(JSHold);
+  // uart.print("    ");
+  // uart.print(analogRead(JXPin));
+  // uart.print(" ");
+  // uart.print(analogRead(JYPin));
+  // uart.print(" ");
+  // uart.print(analogRead(JSPin));
+  // uart.print("    ");
+  // uart.print(millis() - JMillis);
+  // uart.print(menu);
+  // uart.print("    ");
+  // uart.println();
   // delay(100);
 }
