@@ -70,6 +70,29 @@ void FullBridgeRectifier()
   oled.update();
 }
 
+class FlappyBird
+{
+  public:
+    FlappyBird(int test) {}
+    void update()
+    {
+      if (_menu = "Main")
+      {
+        oled.home();
+        oled.clear();
+        oled.println("Flappy Bird");
+        oled.update();
+      }
+    }
+  private:
+    String _menu = "Main";
+    int mainMenues = 4;
+    String mainMenu[4] = {"Play", "Difficulty", "Top Score", "Exit"};
+    int _cursorPosition = 0;
+};
+
+FlappyBird flappyBird(0);
+
 class Settings
 {
   public:
@@ -77,48 +100,46 @@ class Settings
     int brightness = 128;
     void update()
     {
-      menu = "Settings";
-
       oled.home();
       oled.clear();
       oled.invertText(true);
-      oled.println(settings[cursor]);
+      oled.println(_settings[_cursorPosition]);
       oled.invertText(false);
-      for (int i = cursor + 1; i < settingsAmount; i++)
+      for (int i = _cursorPosition + 1; i < _settingsAmount; i++)
       {
-        oled.println(settings[i]);
+        oled.println(_settings[i]);
       }
 
-      oled.rect(128/2, 0, 128/2+brightness/4, 64/8);
+      oled.rect(128/2, 0, 128/2+map(brightness, 2, 253, 0, 255)/4, 64/8);
       oled.setCursor(128/4*2, 0);
       oled.invertText(true);
-      oled.print(brightness);
+      oled.print(map(brightness, 2, 253, 0, 255));
       oled.invertText(false);
 
       oled.update();
 
       if (JX != 0)
       {
-        if (cursor == 0) {brightness += JX; oled.setContrast(brightness); delay(2);}
-        // if (cursor == 1) {}
-        // if (cursor == 2) {}
-        // if (cursor == 3) {}
+        if (_cursorPosition == 0) {brightness += JX; oled.setContrast(brightness); delay(2);}
+        // if (_cursorPosition == 1) {}
+        // if (_cursorPosition == 2) {}
+        // if (_cursorPosition == 3) {}
       }
       if (JYLast > 0)
       {
-        cursor--;
+        _cursorPosition--;
       }
       if (JYLast < 0)
       {
-        cursor++;
+        _cursorPosition++;
       }
-      if (cursor < 0)
+      if (_cursorPosition < 0)
       {
-        cursor = settingsAmount - 1;
+        _cursorPosition = _settingsAmount - 1;
       }
-      if (cursor >= settingsAmount)
+      if (_cursorPosition >= _settingsAmount)
       {
-        cursor = 0;
+        _cursorPosition = 0;
       }
       if (brightness < 2)
       {
@@ -136,16 +157,15 @@ class Settings
       }
     }
   private:
-    int cursor = 0;
-    int settingsAmount = 1;
-    String settings[5] = {"Brightness"};
+    int _cursorPosition = 0;
+    int _settingsAmount = 1;
+    String _settings[5] = {"Brightness"};
 };
 
 Settings settings(0);
 
 void Debug()
 {
-  menu = "Debug";
   oled.clear();
   oled.autoPrintln(false);
   
@@ -214,16 +234,15 @@ void Debug()
 
 void MainMenu(bool update = false)
 {
-  menu = "Main";
-  if (JYLast == JY && JSLast == JS && !update) {return;}
+  // if (JYLast == JY && JSLast == JS && !update) {return;}
   if (JS > 0)
   {
     if (cursorPosition == 0) {}
     if (cursorPosition == 1) {}
-    if (cursorPosition == 2) {}
+    if (cursorPosition == 2) {menu = "FlappyBird";}
     if (cursorPosition == 3) {}
-    if (cursorPosition == 4) {settings.update();}
-    if (cursorPosition == 5) {Debug();}
+    if (cursorPosition == 4) {menu = "Settings";}
+    if (cursorPosition == 5) {menu = "Debug";}
   }
   if (JYLast > 0)
   {
@@ -396,7 +415,6 @@ void setup()
   }
   oled.clear();
   oled.update();
-  MainMenu(true);
 }
 
 void loop() 
@@ -404,7 +422,7 @@ void loop()
   JoystickCheck();
   if (menu == "Main") {MainMenu();}
   if (menu == "") {}
-  if (menu == "") {}
+  if (menu == "FlappyBird") {flappyBird.update();}
   if (menu == "") {}
   if (menu == "Settings") {settings.update();}
   if (menu == "Debug") {Debug();}
