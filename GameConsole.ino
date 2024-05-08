@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <GyverOLED.h>
 #include <charMap.h>
 #include <icons_7x7.h>
@@ -72,7 +73,7 @@ void FullBridgeRectifier()
 class Settings
 {
   public:
-    Settings(int test) {}
+    Settings(int test) {brightness = EEPROM.read(0);}
     int brightness = 128;
     void update()
     {
@@ -89,6 +90,10 @@ class Settings
       }
 
       oled.rect(128/2, 0, 128/2+brightness/4, 64/8);
+      oled.setCursor(128/4*2, 0);
+      oled.invertText(true);
+      oled.print(brightness);
+      oled.invertText(false);
 
       oled.update();
 
@@ -126,6 +131,7 @@ class Settings
 
       if (JSLast != JS && JSLast > 1)
       {
+        EEPROM.put(sizeof(int) * 0, brightness);
         menu = "Main";
       }
     }
