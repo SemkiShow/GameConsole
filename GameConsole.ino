@@ -24,8 +24,6 @@ unsigned long JMillis = 0;
 
 // Public variables
 MicroUART uart;
-int cursorPosition = 0;
-int gamesAmount = 6;
 String menu = "Main";
 
 // OLED init
@@ -73,6 +71,37 @@ void FullBridgeRectifier()
   oled.update();
 }
 
+int PrintMenu(int _cursorPosition, String _menu[], int _menuLength)
+{
+  if (JYLast > 0)
+  {
+    _cursorPosition--;
+  }
+  if (JYLast < 0)
+  {
+    _cursorPosition++;
+  }
+  if (_cursorPosition < 0)
+  {
+    _cursorPosition = _menuLength - 1;
+  }
+  if (_cursorPosition >= _menuLength)
+  {
+    _cursorPosition = 0;
+  }
+  oled.clear();
+  oled.home();
+  oled.invertText(true);
+  oled.println(_menu[_cursorPosition]);
+  oled.invertText(false);
+  for (int i = _cursorPosition + 1; i < _menuLength; i++)
+  {
+    oled.println(_menu[i]);
+  }
+  // oled.update();
+  return _cursorPosition;
+}
+
 class FlappyBird
 {
   public:
@@ -84,13 +113,19 @@ class FlappyBird
         oled.home();
         oled.clear();
         oled.println("Flappy Bird");
+        // oled.println("Play");
+        // oled.println("Settings");
+        // oled.println("Score");
+        _cursorPosition = PrintMenu(_cursorPosition, _mainMenu, _mainMenues);
         oled.update();
+
+
       }
     }
   private:
     String _menu = "Main";
-    int mainMenues = 4;
-    String mainMenu[4] = {"Play", "Difficulty", "Top Score", "Exit"};
+    int _mainMenues = 4;
+    String _mainMenu[4] = {"Play", "Difficulty", "Top Score", "Exit"};
     int _cursorPosition = 0;
 };
 
@@ -103,22 +138,22 @@ class Settings
     int brightness = 128;
     void update()
     {
-      oled.home();
-      oled.clear();
-      oled.invertText(true);
-      oled.println(_settings[_cursorPosition]);
-      oled.invertText(false);
-      for (int i = _cursorPosition + 1; i < _settingsAmount; i++)
-      {
-        oled.println(_settings[i]);
-      }
+      // oled.home();
+      // oled.clear();
+      // oled.invertText(true);
+      // oled.println(_settings[_cursorPosition]);
+      // oled.invertText(false);
+      // for (int i = _cursorPosition + 1; i < _settingsAmount; i++)
+      // {
+      //   oled.println(_settings[i]);
+      // }
 
-      oled.rect(128/2, 0, 128/2+map(brightness, 2, 253, 0, 255)/4, 64/8);
-      oled.setCursor(128/4*2, 0);
-      oled.invertText(true);
-      oled.print(map(brightness, 2, 253, 0, 255));
-      oled.invertText(false);
-
+      // oled.rect(128/2, 0, 128/2+map(brightness, 2, 253, 0, 255)/4, 64/8);
+      // oled.setCursor(128/4*2, 0);
+      // oled.invertText(true);
+      // oled.print(map(brightness, 2, 253, 0, 255));
+      // oled.invertText(false);
+      _cursorPosition = PrintMenu(_cursorPosition, _settings, _settingsAmount);
       oled.update();
 
       if (JX != 0)
@@ -128,22 +163,22 @@ class Settings
         // if (_cursorPosition == 2) {}
         // if (_cursorPosition == 3) {}
       }
-      if (JYLast > 0)
-      {
-        _cursorPosition--;
-      }
-      if (JYLast < 0)
-      {
-        _cursorPosition++;
-      }
-      if (_cursorPosition < 0)
-      {
-        _cursorPosition = _settingsAmount - 1;
-      }
-      if (_cursorPosition >= _settingsAmount)
-      {
-        _cursorPosition = 0;
-      }
+      // if (JYLast > 0)
+      // {
+      //   _cursorPosition--;
+      // }
+      // if (JYLast < 0)
+      // {
+      //   _cursorPosition++;
+      // }
+      // if (_cursorPosition < 0)
+      // {
+      //   _cursorPosition = _settingsAmount - 1;
+      // }
+      // if (_cursorPosition >= _settingsAmount)
+      // {
+      //   _cursorPosition = 0;
+      // }
       if (brightness < 2)
       {
         brightness = 2;
@@ -235,49 +270,59 @@ void Debug()
   }
 }
 
-void MainMenu(bool update = false)
+class MainMenu
 {
-  menu = "Main";
-  // if (JYLast == JY && JSLast == JS && !update) {return;}
-  if (JS > 0)
-  {
-    if (cursorPosition == 0) {}
-    if (cursorPosition == 1) {}
-    if (cursorPosition == 2) {menu = "FlappyBird";}
-    if (cursorPosition == 3) {}
-    if (cursorPosition == 4) {menu = "Settings";}
-    if (cursorPosition == 5) {menu = "Debug";}
-  }
-  if (JYLast > 0)
-  {
-    cursorPosition--;
-  }
-  if (JYLast < 0)
-  {
-    cursorPosition++;
-  }
-  if (cursorPosition < 0)
-  {
-    cursorPosition = gamesAmount - 1;
-  }
-  if (cursorPosition >= gamesAmount)
-  {
-    cursorPosition = 0;
-  }
-  oled.clear();
-  oled.home();
-  // String games[] = {"Tetris", "Snake", "Race", "Tic Tac Toe", "Flappy Bird", "Battleships", "Chess", "Super Mario Bros.", "Platformer", "Pseudo-3D Shooter", "Quizzes", "Text", "Random numbers generator", "Reaction test", "Clicker", "Chrome Dino"};
-  String games[6] = {"Tetris", "Snake", "Flappy Bird", "Race", "Settings", "Debug"};
-  // uart.print(sizeof(games)/sizeof(games[0]));
-  oled.invertText(true);
-  oled.println(games[cursorPosition]);
-  oled.invertText(false);
-  for (int i = cursorPosition + 1; i < gamesAmount; i++)
-  {
-    oled.println(games[i]);
-  }
-  oled.update();
-}
+  public:
+    MainMenu(int test) {}
+    void update()
+    {
+      // if (JYLast == JY && JSLast == JS && !update) {return;}
+      if (JS > 0)
+      {
+        if (_cursorPosition == 0) {}
+        if (_cursorPosition == 1) {}
+        if (_cursorPosition == 2) {menu = "FlappyBird";}
+        if (_cursorPosition == 3) {}
+        if (_cursorPosition == 4) {menu = "Settings";}
+        if (_cursorPosition == 5) {menu = "Debug";}
+      }
+      // if (JYLast > 0)
+      // {
+      //   _cursorPosition--;
+      // }
+      // if (JYLast < 0)
+      // {
+      //   _cursorPosition++;
+      // }
+      // if (_cursorPosition < 0)
+      // {
+      //   _cursorPosition = _gamesAmount - 1;
+      // }
+      // if (_cursorPosition >= _gamesAmount)
+      // {
+      //   _cursorPosition = 0;
+      // }
+      // oled.clear();
+      // oled.home();
+      // // String _games[] = {"Tetris", "Snake", "Race", "Tic Tac Toe", "Flappy Bird", "Battleships", "Chess", "Super Mario Bros.", "Platformer", "Pseudo-3D Shooter", "Quizzes", "Text", "Random numbers generator", "Reaction test", "Clicker", "Chrome Dino"};
+      // // uart.print(sizeof(_games)/sizeof(_games[0]));
+      // oled.invertText(true);
+      // oled.println(_games[_cursorPosition]);
+      // oled.invertText(false);
+      // for (int i = _cursorPosition + 1; i < _gamesAmount; i++)
+      // {
+      //   oled.println(_games[i]);
+      // }
+      _cursorPosition = PrintMenu(_cursorPosition, _games, _gamesAmount);
+      oled.update();
+    }
+  private:
+    int _cursorPosition = 0;
+    int _gamesAmount = 6;
+    String _games[6] = {"Tetris", "Snake", "Flappy Bird", "Race", "Settings", "Debug"};
+};
+
+MainMenu mainMenu(0);
 
 void JoystickCheck()
 {
@@ -419,13 +464,13 @@ void setup()
   }
   oled.clear();
   oled.update();
-  MainMenu();
+  // MainMenu.update();
 }
 
 void loop() 
 {
   JoystickCheck();
-  if (menu == "Main") {MainMenu();}
+  if (menu == "Main") {mainMenu.update();}
   // if (menu == "") {}
   if (menu == "FlappyBird") {flappyBird.update();}
   // if (menu == "") {}
